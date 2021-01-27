@@ -1,11 +1,23 @@
-/**
-* Template Name: Reveal - v2.1.0
-* Template URL: https://bootstrapmade.com/reveal-bootstrap-corporate-template/
-* Author: BootstrapMade.com
-* License: https://bootstrapmade.com/license/
-*/
-!(function($) {
+(function($) {
   "use strict";
+
+  var nav = $('nav');
+  var navHeight = nav.outerHeight();
+
+  $('.navbar-toggler').on('click', function() {
+    if (!$('#mainNav').hasClass('navbar-reduce')) {
+      $('#mainNav').addClass('navbar-reduce');
+    }
+  })
+
+  // Preloader
+  $(window).on('load', function() {
+    if ($('#preloader').length) {
+      $('#preloader').delay(100).fadeOut('slow', function() {
+        $(this).remove();
+      });
+    }
+  });
 
   // Back to top button
   $(window).scroll(function() {
@@ -22,198 +34,102 @@
     return false;
   });
 
-  // Stick the header at top on scroll
-  $("#header").sticky({
-    topSpacing: 0,
-    zIndex: '50'
+  /*--/ Star ScrollTop /--*/
+  $('.scrolltop-mf').on("click", function() {
+    $('html, body').animate({
+      scrollTop: 0
+    }, 1000);
   });
 
-  // Intro background carousel
-  $("#intro-carousel").owlCarousel({
-    autoplay: true,
-    dots: false,
-    loop: true,
-    animateOut: 'fadeOut',
-    items: 1
+  /*--/ Star Counter /--*/
+  $('.counter').counterUp({
+    delay: 15,
+    time: 2000
   });
 
-  // Initiate the wowjs animation library
-  new WOW().init();
-
-  // Initiate superfish on nav menu
-  $('.nav-menu').superfish({
-    animation: {
-      opacity: 'show'
-    },
-    speed: 400
-  });
-
-  // Mobile Navigation
-  if ($('#nav-menu-container').length) {
-    var $mobile_nav = $('#nav-menu-container').clone().prop({
-      id: 'mobile-nav'
-    });
-    $mobile_nav.find('> ul').attr({
-      'class': '',
-      'id': ''
-    });
-    $('body').append($mobile_nav);
-    $('body').prepend('<button type="button" id="mobile-nav-toggle"><i class="fa fa-bars"></i></button>');
-    $('body').append('<div id="mobile-body-overly"></div>');
-    $('#mobile-nav').find('.menu-has-children').prepend('<i class="fa fa-chevron-down"></i>');
-
-    $(document).on('click', '.menu-has-children i', function(e) {
-      $(this).next().toggleClass('menu-item-active');
-      $(this).nextAll('ul').eq(0).slideToggle();
-      $(this).toggleClass("fa-chevron-up fa-chevron-down");
-    });
-
-    $(document).on('click', '#mobile-nav-toggle', function(e) {
-      $('body').toggleClass('mobile-nav-active');
-      $('#mobile-nav-toggle i').toggleClass('fa-times fa-bars');
-      $('#mobile-body-overly').toggle();
-    });
-
-    $(document).click(function(e) {
-      var container = $("#mobile-nav, #mobile-nav-toggle");
-      if (!container.is(e.target) && container.has(e.target).length === 0) {
-        if ($('body').hasClass('mobile-nav-active')) {
-          $('body').removeClass('mobile-nav-active');
-          $('#mobile-nav-toggle i').toggleClass('fa-times fa-bars');
-          $('#mobile-body-overly').fadeOut();
-        }
-      }
-    });
-  } else if ($("#mobile-nav, #mobile-nav-toggle").length) {
-    $("#mobile-nav, #mobile-nav-toggle").hide();
-  }
-
-  // Smooth scroll for the navigation menu and links with .scrollto classes
-  var scrolltoOffset = $('#header').outerHeight() - 1;
-  $(document).on('click', '.nav-menu a, #mobile-nav a, .scrollto', function(e) {
+  /*--/ Star Scrolling nav /--*/
+  var mainNav_height = $('#mainNav').outerHeight() - 22;
+  $('a.js-scroll[href*="#"]:not([href="#"])').on("click", function() {
     if (location.pathname.replace(/^\//, '') == this.pathname.replace(/^\//, '') && location.hostname == this.hostname) {
       var target = $(this.hash);
+      target = target.length ? target : $('[name=' + this.hash.slice(1) + ']');
       if (target.length) {
-        e.preventDefault();
-
-        var scrollto = target.offset().top - scrolltoOffset;
-
+        var scrollto = target.offset().top - mainNav_height;
         $('html, body').animate({
           scrollTop: scrollto
-        }, 1500, 'easeInOutExpo');
-
-        if ($(this).parents('.nav-menu').length) {
-          $('.nav-menu .menu-active').removeClass('menu-active');
-          $(this).closest('li').addClass('menu-active');
-        }
-
-        if ($('body').hasClass('mobile-nav-active')) {
-          $('body').removeClass('mobile-nav-active');
-          $('#mobile-nav-toggle i').toggleClass('fa-times fa-bars');
-          $('#mobile-body-overly').fadeOut();
-        }
+        }, 1000, "easeInOutExpo");
         return false;
       }
     }
   });
 
-  // Activate smooth scroll on page load with hash links in the url
-  $(document).ready(function() {
-    if (window.location.hash) {
-      var initial_nav = window.location.hash;
-      if ($(initial_nav).length) {
-        var scrollto = $(initial_nav).offset().top - scrolltoOffset;
-        $('html, body').animate({
-          scrollTop: scrollto
-        }, 1500, 'easeInOutExpo');
-      }
+  // Scroll to sections on load with hash links
+  if (window.location.hash) {
+    var initial_nav = window.location.hash;
+    if ($(initial_nav).length) {
+      var scrollto_initial = $(initial_nav).offset().top - mainNav_height;
+      $('html, body').animate({
+        scrollTop: scrollto_initial
+      }, 1000, "easeInOutExpo");
     }
+  }
+
+  // Closes responsive menu when a scroll trigger link is clicked
+  $('.js-scroll').on("click", function() {
+    $('.navbar-collapse').collapse('hide');
   });
 
-  // Navigation active state on scroll
-  var nav_sections = $('section');
-  var main_nav = $('.nav-menu, #mobile-nav');
+  // Activate scrollspy to add active class to navbar items on scroll
+  $('body').scrollspy({
+    target: '#mainNav',
+    offset: navHeight
+  });
+  /*--/ End Scrolling nav /--*/
 
+  /*--/ Navbar Menu Reduce /--*/
+  $(window).trigger('scroll');
   $(window).on('scroll', function() {
-    var cur_pos = $(this).scrollTop() + 200;
-
-    nav_sections.each(function() {
-      var top = $(this).offset().top,
-        bottom = top + $(this).outerHeight();
-
-      if (cur_pos >= top && cur_pos <= bottom) {
-        if (cur_pos <= bottom) {
-          main_nav.find('li').removeClass('menu-active');
-        }
-        main_nav.find('a[href="#' + $(this).attr('id') + '"]').parent('li').addClass('menu-active');
+    var pixels = 50;
+    var top = 1200;
+    if ($(window).scrollTop() > pixels) {
+      $('.navbar-expand-md').addClass('navbar-reduce');
+      $('.navbar-expand-md').removeClass('navbar-trans');
+    } else {
+      if (!$('#navbarDefault').hasClass('show')) {
+        $('.navbar-expand-md').removeClass('navbar-reduce');
       }
-      if (cur_pos < 300) {
-        $(".nav-menu li:first").addClass('menu-active');
-      }
-    });
-  });
-
-  // Testimonials carousel (uses the Owl Carousel library)
-  $(".testimonials-carousel").owlCarousel({
-    autoplay: true,
-    dots: true,
-    loop: true,
-    responsive: {
-      0: {
-        items: 1
-      },
-      768: {
-        items: 2
-      },
-      900: {
-        items: 3
-      }
+      $('.navbar-expand-md').addClass('navbar-trans');
+    }
+    if ($(window).scrollTop() > top) {
+      $('.scrolltop-mf').fadeIn(1000, "easeInOutExpo");
+    } else {
+      $('.scrolltop-mf').fadeOut(1000, "easeInOutExpo");
     }
   });
 
-  // Clients carousel (uses the Owl Carousel library)
-  $(".clients-carousel").owlCarousel({
+  /*--/ Star Typed /--*/
+  if ($('.text-slider').length == 1) {
+    var typed_strings = $('.text-slider-items').text();
+    var typed = new Typed('.text-slider', {
+      strings: typed_strings.split(','),
+      typeSpeed: 80,
+      loop: true,
+      backDelay: 1100,
+      backSpeed: 30
+    });
+  }
+
+  /*--/ Testimonials owl /--*/
+  $('#testimonial-mf').owlCarousel({
+    margin: 20,
     autoplay: true,
-    dots: true,
-    loop: true,
+    autoplayTimeout: 4000,
+    autoplayHoverPause: true,
     responsive: {
       0: {
-        items: 2
-      },
-      768: {
-        items: 4
-      },
-      900: {
-        items: 6
+        items: 1,
       }
     }
-  });
-
-  // Initiate venobox (lightbox feature used in portofilo)
-  $(document).ready(function() {
-    $('.venobox').venobox();
-  });
-
-  // Porfolio isotope and filter
-  $(window).on('load', function() {
-    var portfolioIsotope = $('.portfolio-container').isotope({
-      itemSelector: '.portfolio-item',
-      layoutMode: 'fitRows'
-    });
-
-    $('#portfolio-flters li').on('click', function() {
-      $("#portfolio-flters li").removeClass('filter-active');
-      $(this).addClass('filter-active');
-
-      portfolioIsotope.isotope({
-        filter: $(this).data('filter')
-      });
-    });
-
-    // Initiate venobox (lightbox feature used in portofilo)
-    $(document).ready(function() {
-      $('.venobox').venobox();
-    });
   });
 
   // Portfolio details carousel
@@ -224,4 +140,56 @@
     items: 1
   });
 
+  // Initiate venobox (lightbox feature used in portofilo)
+  $(document).ready(function() {
+    $('.venobox').venobox({
+      'share': false
+    });
+  });
+
 })(jQuery);
+
+
+//youtube 
+
+/* Light YouTube Embeds by @labnol */
+/* Web: https://www.labnol.org/ */
+
+function labnolIframe(div) {
+  var iframe = document.createElement("iframe");
+  iframe.setAttribute(
+    "src",
+    "https://www.youtube.com/embed/" + div.dataset.id + "?autoplay=1&rel=0"
+  );
+  iframe.setAttribute("frameborder", "0");
+  iframe.setAttribute("allowfullscreen", "1");
+  iframe.setAttribute(
+    "allow",
+    "accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+  );
+  div.parentNode.replaceChild(iframe, div);
+}
+
+function initYouTubeVideos() {
+  var playerElements = document.getElementsByClassName("youtube-player");
+  for (var n = 0; n < playerElements.length; n++) {
+    var videoId = playerElements[n].dataset.id;
+    var div = document.createElement("div");
+    div.setAttribute("data-id", videoId);
+    var thumbNode = document.createElement("img");
+    thumbNode.src = "https://i.ytimg.com/vi/ID/hqdefault.jpg".replace(
+      "ID",
+      videoId
+    );
+    div.appendChild(thumbNode);
+    var playButton = document.createElement("div");
+    playButton.setAttribute("class", "play");
+    div.appendChild(playButton);
+    div.onclick = function () {
+      labnolIframe(this);
+    };
+    playerElements[n].appendChild(div);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", initYouTubeVideos);
